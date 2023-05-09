@@ -3,7 +3,6 @@
 import shutil
 from pathlib import Path
 
-import requests
 from setuptools import setup
 
 ANIME4K_COMMIT = "master"
@@ -14,6 +13,8 @@ SHADERS_DIR = Path(__file__).parent / "anime4k_python" / Path("shaders")
 
 
 def download_and_combine_files():
+    import requests
+
     modes = {
         "ModeA": [
             f"{GITHUB_GLSL_ROOT}/Restore/Anime4K_Clamp_Highlights.glsl",
@@ -37,15 +38,13 @@ def download_and_combine_files():
 
 
 # clear shaders directory
-if SHADERS_DIR.exists():
-    shutil.rmtree(SHADERS_DIR)
-SHADERS_DIR.mkdir(exist_ok=True)
+# if SHADERS_DIR.exists():
+#    shutil.rmtree(SHADERS_DIR)
+# SHADERS_DIR.mkdir(exist_ok=True)
 
 # download and combine shaders
-download_and_combine_files()
+# download_and_combine_files()
 
 setup(
-    install_requires=[
-        "requests",
-    ],
+    # install_requires=["requests"],
 )
