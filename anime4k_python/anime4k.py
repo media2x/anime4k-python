@@ -7,14 +7,18 @@ Date Created: May 8, 2023
 Last Modified: May 8, 2023
 """
 import pathlib
+import subprocess
 from typing import Optional
 
 import ffmpeg
 
 
 class Anime4K:
-    def __init__(self, mode: str = "A", *_args, **_kwargs):
+    def __init__(self, backend="mpv", mode: str = "A", *_args, **_kwargs):
+        self.backend = backend
         self.mode = mode
+
+        assert backend in ["mpv", "ffmpeg"], "backend must be either mpv or ffmpeg"
 
         # locate shader file
         self.shader_path = (
@@ -40,21 +44,32 @@ class Anime4K:
         elif output_width is None or output_height is None:
             raise ValueError("both output_width and output_height must be provided")
 
-        # process video
-        (
-            ffmpeg.input(str(input_path.absolute()))
-            .output(
-                str(output_path.absolute()),
-                vf="format=yuv420p10,hwupload,"
-                f"libplacebo=w={output_width}:h={output_height}:upscaler=ewa_lanczos:"
-                f"custom_shader_path={self.shader_path},hwdownload,"
-                "format=yuv420p10",
-                init_hw_device="vulkan",
+        if self.backend == "mpv":
+            command = [
+                "mpv",
+                "--no-sub",
+                f"--glsl-shaders={self.shader_path}",
+                f"-vf=gpu=w={output_width}:h={output_height}",
+                f"-o={output_path}",
+                input_path,
+            ]
+            subprocess.run(command, check=True)
+
+        elif self.backend == "ffmpeg":
+            (
+                ffmpeg.input(str(input_path.absolute()))
+                .output(
+                    str(output_path.absolute()),
+                    vf="format=yuv420p10,hwupload,"
+                    f"libplacebo=w={output_width}:h={output_height}:upscaler=ewa_lanczos:"
+                    f"custom_shader_path={self.shader_path},hwdownload,"
+                    "format=yuv420p10",
+                    init_hw_device="vulkan",
+                )
+                .global_args("-hide_banner")
+                .run(overwrite_output=True)
             )
-            .global_args("-hide_banner")
-            .run(overwrite_output=True)
-        )
-    
+
     def process_image(
         self,
         input_path: pathlib.Path,
