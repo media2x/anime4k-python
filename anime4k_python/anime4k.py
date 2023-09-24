@@ -6,6 +6,7 @@ Author: K4YT3X
 Date Created: May 8, 2023
 Last Modified: May 8, 2023
 """
+import os
 import pathlib
 import subprocess
 from typing import Optional
@@ -53,6 +54,11 @@ class Anime4K:
                 f"-o={output_path}",
                 input_path,
             ]
+
+            # xvfb is required to run mpv on a headless server
+            if os.environ.get("DISPLAY") is None:
+                command = ["xvfb-run", "-a"] + command
+
             subprocess.run(command, check=True)
 
         elif self.backend == "ffmpeg":
