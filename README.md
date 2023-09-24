@@ -7,7 +7,7 @@ Python wrapper of Anime4K GLSL shaders achieved with FFmpeg and libplacebo.
 ```
 from anime4k_python import Anime4K
 
-anime4k = Anime4K(mode="A")
+anime4k = Anime4K(backend="mpv", mode="A")
 anime4k.process_video(
     "input.mp4",
     "output.mp4",
