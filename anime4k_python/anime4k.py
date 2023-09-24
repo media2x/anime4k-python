@@ -2,9 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Name: Anime4K Python
-Author: K4YT3X
-Date Created: May 8, 2023
-Last Modified: May 8, 2023
+Author: K4YT3X <i@k4yt3x.com>
 """
 import os
 import pathlib
@@ -58,6 +56,10 @@ class Anime4K:
             # xvfb is required to run mpv on a headless server
             if os.environ.get("DISPLAY") is None:
                 command = ["xvfb-run", "-a"] + command
+
+            # if a display exists, try to enable hardware acceleration
+            else:
+                command.insert(1, "--hwdec=auto-safe")
 
             subprocess.run(command, check=True)
 
